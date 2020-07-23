@@ -31,6 +31,13 @@ class User extends Model {
         }
     }
 
+    public static function getPasswordHash($password) {
+
+        return password_hash($password, PASSWORD_DEFAULT, [
+            'cost' => 12
+        ]);
+    }
+
     public static function verifyLogin($inadmin = true) {
         if (
                 !isset($_SESSION[User::SESSION]) ||
@@ -59,7 +66,7 @@ class User extends Model {
         $results = $sql->select("CALL sp_users_save(:desperson, :deslogin, :despassword, :desemail, :nrphone, :inadmin)", array(
             ":desperson" => $this->getdesperson(),
             ":deslogin" => $this->getdeslogin(),
-            ":despassword" => $this->getdespassword(),
+            ":despassword" => $this->getPasswordHash($this->getdespassword()),
             ":desemail" => $this->getdesemail(),
             ":nrphone" => $this->getnrphone(),
             ":inadmin" => $this->getinadmin()

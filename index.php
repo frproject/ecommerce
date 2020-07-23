@@ -7,6 +7,7 @@ use Slim\Slim;
 use Hcode\Page;
 use Hcode\PageAdmin;
 use Hcode\Model\User;
+use Hcode\Model\Category;
 
 $app = new Slim();
 
@@ -87,6 +88,7 @@ $app->post("/admin/users/create", function () {
     User::verifyLogin();
     $user = new User();
     $_POST["inadmin"] = (isset($_POST["inadmin"])) ? 1 : 0;
+
     $user->setData($_POST);
     $user->save();
     header("Location: /admin/users");
@@ -103,5 +105,67 @@ $app->post("/admin/users/:iduser", function ($iduser) {
     header("Location: /admin/users");
     exit;
 });
+
+$app->get("/admin/categories", function() {
+    User::verifyLogin();
+    $categories = Category::listAll();
+
+    $page = new PageAdmin();
+    $page->setTpl("categories", array(
+        "categories" => $categories
+    ));
+});
+
+$app->get("/admin/categories/create", function () {
+    User::verifyLogin();
+    $page = new PageAdmin();
+    $page->setTpl("categories-create");
+});
+
+$app->post("/admin/categories/create", function () {
+    User::verifyLogin();
+    $category = new Category();
+
+
+    $category->setData($_POST);
+    $category->save();
+    header("Location: /admin/categories");
+    exit;
+});
+
+$app->get("/admin/categories/:idcategory/delete", function ($idcategory) {
+    User::verifyLogin();
+    $category = new Category();
+
+    $category->get((int) $idcategory);
+    $category->delete();
+    header("Location: /admin/categories");
+    exit();
+});
+
+$app->get("/admin/categories/:id", function ($id) {
+    User::verifyLogin();
+
+    $category = new Category();
+
+    $category->get((int) $id);
+
+    $page = new PageAdmin();
+    $page->setTpl("categories-update", array(
+        "category" => $category->getValues()
+    ));
+});
+
+$app->post("/admin/categories/:id", function ($id) {
+    User::verifyLogin();
+    $category = new Category();
+    $category->get((int) $id);
+    $category->setData($_POST);
+    $category->save();
+    header("Location: /admin/categories");
+    exit;
+});
+
+
 
 $app->run();
