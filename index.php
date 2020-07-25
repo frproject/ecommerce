@@ -106,6 +106,30 @@ $app->post("/admin/users/:iduser", function ($iduser) {
     exit;
 });
 
+$app->get("/admin/forgot", function() {
+    $page = new PageAdmin([
+        "header" => false,
+        "footer" => false,
+    ]);
+
+    $page->setTpl("forgot");
+});
+
+$app->post("/admin/forgot", function() {
+    User::getForgot($_POST["email"]);
+    header("Location: /admin/forgot/sent");
+});
+
+$app->get("/admin/forgot/sent", function() {
+    $page = new PageAdmin([
+        "header" => false,
+        "footer" => false,
+    ]);
+
+    $page->setTpl("forgot-sent");
+});
+
+
 $app->get("/admin/categories", function() {
     User::verifyLogin();
     $categories = Category::listAll();
@@ -165,6 +189,8 @@ $app->post("/admin/categories/:id", function ($id) {
     header("Location: /admin/categories");
     exit;
 });
+
+
 
 
 
